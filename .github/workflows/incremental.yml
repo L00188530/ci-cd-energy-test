@@ -1,0 +1,39 @@
+name: Incremental CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.filter.outputs.files }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Get Changed Files
+        id: filter
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          echo "files=$CHANGED_FILES" >> $GITHUB_ENV
+
+  build:
+    runs-on: ubuntu-latest
+    needs: changes
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Run Tests on Changed Files
+        if: env.files != ''
+        run: npm test -- ${{ env.files }}  # Run tests only for changed files
+
+      - name: Build Only Changed Components
+        if: env.files != ''
+        run: echo "Building modified parts only..."
