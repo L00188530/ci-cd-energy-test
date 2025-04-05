@@ -1,0 +1,25 @@
+name: Non-Incremental CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
+        run: npm install  # Change this based on your tech stack
+
+      - name: Run Tests
+        run: npm test  # Run all tests
+
+      - name: Build Application
+        run: npm run build  # Build entire application
+
+      - name: Deploy
+        run: echo "Deploying to production..."
